@@ -56,29 +56,30 @@ class Test(db.Model):
 
 def threadtest():
     while True:
-        test = Test()
-        test.nameid = str(random.randint(0,9))
-        test.cardid = str(random.randint(0,9))
-        test.pswd = str(random.randint(0,9))
-        if not Test.query.filter(Test.nameid == test.nameid,
-                                 Test.cardid == test.cardid).first():
-            try:
-                db.session.add(test)
-                db.session.commit()
-                return "数据插入成功nameid = %s ,cardid = %s, pswd = %s" % (
-                    test.nameid, test.cardid, test.pswd)
-            except Exception as e:
-                return "错误:%s" % e
+        for i in range(100):
+            test = Test()
+            test.nameid = str(random.randint(0,9))
+            test.cardid = str(random.randint(0,9))
+            test.pswd = str(random.randint(0,9))
+            if not Test.query.filter(Test.nameid == test.nameid,
+                                     Test.cardid == test.cardid).first():
+                try:
+                    db.session.add(test)
+                    db.session.commit()
+                    return "数据插入成功nameid = %s ,cardid = %s, pswd = %s" % (
+                        test.nameid, test.cardid, test.pswd)
+                except Exception as e:
+                    return "错误:%s" % e
 
 
-# @app.route('/testingthread', methods=['GET'])
+@app.route('/testingthread', methods=['GET'])
 def main():
-    # if request.method == 'GET':
-    #     while True:
-    for i in range(5):
-        t = threading.Thread(target=threadtest)
-        t.start()
-        return "正在执行多线程"
+    if request.method == 'GET':
+        # while True:
+        for i in range(5):
+            t = threading.Thread(target=threadtest)
+            t.start()
+            return "/testingthread-正在执行多线程"
 
 @app.route('/index', methods=['GET','POST'])
 def index():
@@ -119,12 +120,11 @@ def test():
 if __name__ == '__main__':
     db.drop_all()    # 清除数据库里的所有数据
     db.create_all()  # 创建所有的表
-    # test1 = Test(nameid = "1", cardid = "1", pswd = "1")
-    # test2 = Test(nameid = "2", cardid = "2", pswd = "2")
-    # db.session.add_all([test1,test2])
-    # db.session.commit()
+    test1 = Test(nameid = "1", cardid = "1", pswd = "1")
+    test2 = Test(nameid = "2", cardid = "2", pswd = "2")
+    db.session.add_all([test1,test2])
+    db.session.commit()
     app.run(debug=True)
-    main()
 
 
 

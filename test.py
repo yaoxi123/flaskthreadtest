@@ -120,4 +120,49 @@ if __name__ == '__main__':
     # app.run(debug=True)
 
 
+#!flask/bin/python
+import random
+import unittest
+import threading
+from app import Config
+from app import app, db
+from app import Test
+
+
+class TestCase(unittest.TestCase):
+    def setUp(self):
+        app.config.from_object(Config)
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def threadtest(self):
+        while True:
+            for i in range(100):
+                test = Test()
+                test.nameid = str(random.randint(0, 9))
+                test.cardid = str(random.randint(0, 9))
+                test.pswd = str(random.randint(0, 9))
+                if not Test.query.filter(Test.nameid == test.nameid,
+                                         Test.cardid == test.cardid).first():
+                    try:
+                        db.session.add(test)
+                        db.session.commit()
+                        return "数据插入成功nameid = %s ,cardid = %s, pswd = %s" % (
+                            test.nameid, test.cardid, test.pswd)
+                    except Exception as e:
+                        return "错误:%s" % e
+
+    def main(self):
+        for i in range(5):
+            t = threading.Thread(target=threadtest)
+            t.start()
+            return "/testingthread-正在执行多线程"
+
+
+if __name__ == '__main__':
+    unittest.main()
 
