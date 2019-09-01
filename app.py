@@ -1,5 +1,9 @@
+
 import random
 import threading
+import time
+from datetime import datetime
+
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import UniqueConstraint
@@ -44,6 +48,7 @@ class Test(db.Model):
     # 创建联合唯一索引
     __table_args__ = (
         UniqueConstraint(
+            # "id",
             "nameid",
             "cardid",
             name = "name_card"
@@ -53,6 +58,7 @@ class Test(db.Model):
     nameid = db.Column(db.String(64))
     cardid= db.Column(db.String(64))
     pswd = db.Column(db.String(64))
+    ticks = db.Column(db.Integer)
 
 def threadtest():
     while True:
@@ -120,8 +126,8 @@ def test():
 if __name__ == '__main__':
     db.drop_all()    # 清除数据库里的所有数据
     db.create_all()  # 创建所有的表
-    test1 = Test(nameid = "1", cardid = "1", pswd = "1")
-    test2 = Test(nameid = "2", cardid = "2", pswd = "2")
+    test1 = Test(nameid = "1", cardid = "1", pswd = "1", ticks = time.time())
+    test2 = Test(nameid = "2", cardid = "2", pswd = "2", ticks = time.time())
     db.session.add_all([test1,test2])
     db.session.commit()
     app.run(debug=True)
